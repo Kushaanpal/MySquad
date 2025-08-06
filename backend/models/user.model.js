@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: '', // optional profile picture URL
+      default: '',
     },
     isAdmin: {
       type: Boolean,
@@ -32,14 +32,25 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
     location: {
-      type: String,
-      default: '',
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+        default: [0, 0],
+      },
     },
   },
   {
-    timestamps: true, // automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
+
+// ✅ Geospatial index
+userSchema.index({ location: '2dsphere' });
 
 const User = mongoose.model('User', userSchema);
 
