@@ -59,7 +59,7 @@ export const getMatchById = async (req, res) => {
   try {
     const match = await Match.findById(req.params.id)
       .populate('creator', 'username')
-      .populate('players', 'username');
+      .populate('participants', 'username');
 
     if (!match) return res.status(404).json({ message: 'Match not found' });
 
@@ -110,13 +110,15 @@ export const joinMatch = async (req, res) => {
 
     if (!match) return res.status(404).json({ message: 'Match not found' });
 
-    if (match.players.includes(req.user._id))
+    if (!Array.isArray(match.participants)) match.participants = [];
+
+    if (match.participants.includes(req.user._id))
       return res.status(400).json({ message: 'Already joined this match' });
 
-    if (match.players.length >= match.maxPlayers)
+    if (match.participants.length >= match.maxPlayers)
       return res.status(400).json({ message: 'Match is full' });
 
-    match.players.push(req.user._id);
+    match.participants.push(req.user._id);
     await match.save();
 
     res.status(200).json({ message: 'Joined match successfully' });
@@ -132,7 +134,7 @@ export const leaveMatch = async (req, res) => {
 
     if (!match) return res.status(404).json({ message: 'Match not found' });
 
-    match.players = match.players.filter((id) => id.toString() !== req.user._id.toString());
+    match.participants = match.participants.filter((id) => id.toString() !== req.user._id.toString());
     await match.save();
 
     res.status(200).json({ message: 'Left match successfully' });
