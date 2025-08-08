@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import userRoutes from './routes/user.route.js';
 import matchRoutes from './routes/match.route.js';
+import notificationRoutes from './routes/notification.route.js';
 import path from 'path';
 import fs from 'fs'; // <-- Add this
 import { fileURLToPath } from 'url';
@@ -36,6 +37,7 @@ mongoose.connect(DB_URI)
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Static folder for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

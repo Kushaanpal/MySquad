@@ -1,22 +1,20 @@
 import Match from '../models/match.model.js';
 import mongoose from 'mongoose';
+import sendNotification from '../utils/sendNotification.js';
 
 // POST /api/matches/create - Create a new match (Protected)
 export const createMatch = async (req, res) => {
   try {
-    // If req.body is undefined (e.g. invalid form-data), return early
     if (!req.body) {
       return res.status(400).json({ message: "Form data is missing." });
     }
 
     const { title, sport, date, latitude, longitude, description } = req.body;
 
-    // Check required fields
     if (!title || !sport || !date || !latitude || !longitude) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
-    // Create new match document
     const match = new Match({
       title,
       sport,
@@ -27,11 +25,18 @@ export const createMatch = async (req, res) => {
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
       },
       image: req.file?.path || null,
-      creator: req.user._id, // from authenticateUser middleware
+      creator: req.user._id,
     });
 
-    // Save match to DB
     await match.save();
+
+    // Notify creator about match creation
+    await sendNotification({
+      userId: req.user._id,
+      message: `You have created a match: ${title}`,
+      type: 'match_created',
+      matchId: match._id
+    });
 
     res.status(201).json({
       message: "Match created successfully",
@@ -43,11 +48,10 @@ export const createMatch = async (req, res) => {
   }
 };
 
-
 // GET /api/matches - Get all public matches
 export const getAllMatches = async (req, res) => {
   try {
-   const matches = await Match.find().populate('participants').populate('creator', 'name email');
+    const matches = await Match.find().populate('participants').populate('creator', 'name email');
     res.status(200).json(matches);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching matches', error: error.message });
@@ -121,6 +125,14 @@ export const joinMatch = async (req, res) => {
     match.participants.push(req.user._id);
     await match.save();
 
+    // Notify creator that someone joined
+    await sendNotification({
+      userId: match.creator,
+      message: `${req.user.username} joined your match: ${match.title}`,
+      type: 'match_joined',
+      matchId: match._id
+    });
+
     res.status(200).json({ message: 'Joined match successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error joining match', error: error.message });
@@ -134,8 +146,18 @@ export const leaveMatch = async (req, res) => {
 
     if (!match) return res.status(404).json({ message: 'Match not found' });
 
-    match.participants = match.participants.filter((id) => id.toString() !== req.user._id.toString());
+    match.participants = match.participants.filter(
+      (id) => id.toString() !== req.user._id.toString()
+    );
     await match.save();
+
+    // Notify creator that someone left
+    await sendNotification({
+      userId: match.creator,
+      message: `${req.user.username} left your match: ${match.title}`,
+      type: 'match_left',
+      matchId: match._id
+    });
 
     res.status(200).json({ message: 'Left match successfully' });
   } catch (error) {
