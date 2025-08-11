@@ -27,10 +27,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    sportsInterests: {
-      type: [String],
-      default: [],
-    },
+    sportsInterests: [
+      {
+        sport: { type: String, required: true, trim: true },
+        skillLevel: {
+          type: String,
+          enum: ['beginner', 'intermediate', 'advanced'],
+          required: true
+        }
+      }
+    ],
     location: {
       type: {
         type: String,
@@ -49,7 +55,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ✅ Geospatial index
 userSchema.index({ location: '2dsphere' });
 
 const User = mongoose.model('User', userSchema);

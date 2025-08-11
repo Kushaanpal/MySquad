@@ -4,8 +4,9 @@ import mongoose from 'mongoose';
 import userRoutes from './routes/user.route.js';
 import matchRoutes from './routes/match.route.js';
 import notificationRoutes from './routes/notification.route.js';
+import searchRoutes from "./routes/search.route.js";
 import path from 'path';
-import fs from 'fs'; // <-- Add this
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
@@ -38,6 +39,8 @@ mongoose.connect(DB_URI)
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use("/api/search", searchRoutes);
+
 
 // Static folder for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
