@@ -96,16 +96,15 @@ export const updateUserProfile = async (req, res) => {
 };
 //get nearby users according to nearby location(10 km)
 export const getNearbyUsers = async (req, res) => {
-  const { location, sportsInterests = [], maxDistance = 10000 } = req.body;
+  let { location, sportsInterests = [], maxDistance = 10000 } = req.body;
 
-  if (
-    !location ||
-    !location.coordinates ||
-    location.coordinates.length !== 2
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Latitude and longitude required" });
+  // Force sportsInterests into array
+  if (!Array.isArray(sportsInterests)) {
+    sportsInterests = [sportsInterests];
+  }
+
+  if (!location || !location.coordinates || location.coordinates.length !== 2) {
+    return res.status(400).json({ message: "Latitude and longitude required" });
   }
 
   try {
@@ -113,7 +112,7 @@ export const getNearbyUsers = async (req, res) => {
       location: {
         $near: {
           $geometry: {
-            type: "Point",
+            type: location.type || "Point",
             coordinates: location.coordinates.map(Number), // [lng, lat]
           },
           $maxDistance: parseInt(maxDistance),
@@ -122,7 +121,14 @@ export const getNearbyUsers = async (req, res) => {
     };
 
     if (sportsInterests.length > 0) {
-      query.sportsInterests = { $in: sportsInterests };
+      query.sportsInterests = {
+        $elemMatch: {
+          $or: sportsInterests.map(si => ({
+            sport: si.sport,
+            skillLevel: si.skillLevel
+          }))
+        }
+      };
     }
 
     const users = await User.find(query).select("-password");
@@ -145,3 +151,4 @@ export const getNearbyUsers = async (req, res) => {
     });
   }
 };
+

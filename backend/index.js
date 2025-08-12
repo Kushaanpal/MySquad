@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from "cors";
 import mongoose from 'mongoose';
 import userRoutes from './routes/user.route.js';
 import matchRoutes from './routes/match.route.js';
@@ -26,7 +27,10 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Middleware
 app.use(express.json());
-
+app.use(cors({
+  origin: "http://localhost:5173", // Your React app URL
+  credentials: true,               // If you use cookies/auth
+}));
 // MongoDB Connection
 mongoose.connect(DB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
