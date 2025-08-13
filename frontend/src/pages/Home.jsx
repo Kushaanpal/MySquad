@@ -1,5 +1,7 @@
+// src/pages/Home.jsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header.jsx"; // import your header
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
@@ -8,7 +10,7 @@ export default function Home() {
     <div className="relative min-h-screen w-full overflow-y-auto font-poppins">
       {/* Background Video */}
       <video
-        src="/backround-video.mp4" // make sure spelling is correct
+        src="/backround-video.mp4" // make sure spelling and path are correct
         autoPlay
         loop
         muted
@@ -21,6 +23,9 @@ export default function Home() {
 
       {/* Dark overlay */}
       <div className="fixed inset-0 bg-black/60"></div>
+
+      {/* Header */}
+      <Header />
 
       {/* Page Content */}
       <div className="relative z-10 text-white">
@@ -35,7 +40,7 @@ export default function Home() {
           </p>
           <div className="mt-6 flex gap-4">
             <Link
-              to="/book"
+              to="/matches/create"
               className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition"
             >
               Book a Venue

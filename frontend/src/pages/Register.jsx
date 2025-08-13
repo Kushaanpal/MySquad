@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api.js';
 import { toast } from 'react-toastify';
-import sportsBackground from '../assets/sports-background.png'; // Replace with your image path
+import sportsBackground from '../assets/background-image.jpg'; // Replace with your image path
 
 export default function Register() {
   const [username, setUsername] = useState('');
