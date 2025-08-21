@@ -13,7 +13,8 @@ import userRoutes from './routes/user.route.js';
 import matchRoutes from './routes/match.route.js';
 import notificationRoutes from './routes/notification.route.js';
 import searchRoutes from "./routes/search.route.js";
-import authRoutes from "./routes/auth.route.js"; // ✅ NEW Google Auth route
+import authRoutes from "./routes/auth.route.js"; 
+import venueRoutes from "./routes/venue.route.js"; // ✅ New Venue routes
 
 // Load env & passport config
 dotenv.config();
@@ -65,7 +66,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use("/api/search", searchRoutes);
-app.use("/auth", authRoutes); // ✅ Google login
+app.use("/auth", authRoutes); 
+app.use("/api/venues", venueRoutes); // ✅ Mounted Venue routes
 
 // Static folder for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

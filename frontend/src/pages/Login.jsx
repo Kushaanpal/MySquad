@@ -1,82 +1,196 @@
-import { useState, useEffect } from "react";
-import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { motion } from "framer-motion";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
-  // ✅ Handle Google login results
+  // Login state
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // Register state
+  const [regUsername, setRegUsername] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+
+  // Google Login
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const googleError = params.get("error");
-
-    if (googleError === "id_not_registered") {
-      toast.error("❌ Google account not registered. Please sign up first.");
-      navigate("/login");
-      return;
-    }
 
     if (token) {
       localStorage.setItem("token", token);
-      toast.success("✅ Google login successful!");
+      toast.success("✅ Login successful!");
+      setIsLoggedIn(true);
       navigate("/");
+      window.history.replaceState({}, document.title, "/login");
     }
   }, [navigate]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    try {
-      const res = await api.post("/users/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      toast.success("✅ Login successful!");
-      navigate("/");
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
-  };
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:4001/auth/google";
   };
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-8">
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img
-            src="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/favicon.png"
-            alt="Logo"
-            className="w-10 h-10"
-          />
-        </div>
+  // Email/password login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:4001/api/users/login", {
+        email: loginEmail,
+        password: loginPassword,
+      });
+      localStorage.setItem("token", res.data.token);
+      toast.success("✅ Login successful!");
+      setIsLoggedIn(true);
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed");
+    }
+  };
 
+  // Registration
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:4001/api/users/register", {
+        username: regUsername,
+        email: regEmail,
+        password: regPassword,
+      });
+      localStorage.setItem("token", res.data.token);
+      toast.success("✅ Registration successful!");
+      setIsLoggedIn(true);
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration failed");
+    }
+  };
+
+  if (isLoggedIn || localStorage.getItem("token")) {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <div className="relative flex items-center justify-start min-h-screen px-24">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src="/sports.jpg" // your background image
+          alt="Background"
+          className="w-full h-full object-cover opacity-60 blur-sm"
+        />
+      </div>
+
+      {/* Overlay Form */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-md px-8 py-10 bg-white/80 backdrop-blur-md rounded-2xl shadow-xl"
+      >
         {/* Title */}
-        <h2 className="text-xl font-semibold text-center text-gray-800 mb-1">
-          Sign in to your account
+        <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">
+          {isRegistering ? "Create an account" : "Welcome back"}
         </h2>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Continue with your email or Google
+          {isRegistering ? "Join us by registering below" : "Sign in to continue"}
         </p>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 text-red-600 p-2 rounded-md text-sm mb-4">
-            {error}
-          </div>
+        {/* Login Form */}
+        {!isRegistering && (
+          <form onSubmit={handleLogin} className="space-y-4 mb-4">
+            <input
+              type="email"
+              placeholder="Email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-200 transition"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-200 transition"
+            />
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              type="submit"
+              className="w-full bg-teal-500 text-white py-2 rounded-lg shadow hover:bg-teal-600 transition"
+            >
+              Login
+            </motion.button>
+          </form>
         )}
 
+        {/* Register Form */}
+        {isRegistering && (
+          <form onSubmit={handleRegister} className="space-y-4 mb-4">
+            <input
+              type="text"
+              placeholder="Username"
+              value={regUsername}
+              onChange={(e) => setRegUsername(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 transition"
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={regEmail}
+              onChange={(e) => setRegEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 transition"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={regPassword}
+              onChange={(e) => setRegPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 transition"
+            />
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              type="submit"
+              className="w-full bg-teal-500 text-white py-2 rounded-lg shadow hover:bg-teal-600 transition"
+            >
+              Register
+            </motion.button>
+          </form>
+        )}
+
+        {/* Toggle */}
+        <div
+          className="text-center text-teal-600 font-medium cursor-pointer mb-4 hover:underline"
+          onClick={() => setIsRegistering(!isRegistering)}
+        >
+          {isRegistering
+            ? "Already have an account? Login"
+            : "Don’t have an account? Register"}
+        </div>
+
+        <div className="flex items-center my-4">
+          <div className="flex-grow h-px bg-gray-200"></div>
+          <span className="px-3 text-gray-400 text-sm">or</span>
+          <div className="flex-grow h-px bg-gray-200"></div>
+        </div>
+
         {/* Google Login */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-md py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+          className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
         >
           <img
             src="https://www.svgrepo.com/show/355037/google.svg"
@@ -84,70 +198,8 @@ export default function Login() {
             className="w-4 h-4"
           />
           Continue with Google
-        </button>
-
-        {/* Divider */}
-        <div className="flex items-center my-5">
-          <div className="flex-grow h-px bg-gray-300"></div>
-          <span className="mx-3 text-xs text-gray-400">OR</span>
-          <div className="flex-grow h-px bg-gray-300"></div>
-        </div>
-
-        {/* Email/Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-medium text-gray-600 mb-1"
-            >
-              Email address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-xs font-medium text-gray-600 mb-1"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-md shadow-sm"
-          >
-            Sign in
-          </button>
-        </form>
-
-        {/* Footer */}
-        <p className="text-xs text-gray-500 text-center mt-6">
-          New here?{" "}
-          <a
-            href="/register"
-            className="text-blue-600 font-medium hover:underline"
-          >
-            Create an account
-          </a>
-        </p>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 }

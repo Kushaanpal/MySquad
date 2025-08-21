@@ -3,13 +3,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Register NEW User
- export const registerUser = async (req, res) => {
+// Register NEW User
+export const registerUser = async (req, res) => {
   try {
     const { username, email, password, location, sportsInterests } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,36 +25,72 @@ import jwt from 'jsonwebtoken';
       location,
       sportsInterests,
     });
-    res.status(201).json({ message: 'User registered successfully', userId: user._id });
+
+    // ✅ Unified JWT payload (same as Google + login)
+    const payload = {
+      id: user._id,
+      email: user.email,
+      username: user.username,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "2d",
+    });
+
+    res.status(201).json({
+      message: "User registered & logged in successfully",
+      token,
+      userId: user._id,
+      ...payload, // so frontend gets details immediately
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error registering user', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error registering user", error: error.message });
   }
 };
 
+
 // Login User
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     // find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'ID not registered' });
+      return res.status(400).json({ message: "ID not registered" });
     }
-    
+
     // check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
+      return res.status(400).json({ message: "Invalid password" });
     }
-    
-    // create JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2d' });
-    res.status(200).json({ message: 'Login successful', token, userId: user._id });
+
+    // ✅ Unified JWT payload (same as Google login)
+    const payload = {
+      id: user._id,
+      email: user.email,
+      username: user.username || user.name, // fallback in case of Google user
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "2d",
+    });
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      userId: user._id,
+      ...payload, // optional, so frontend can get username/email immediately
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
+    res.status(500).json({ message: "Error logging in", error: error.message });
   }
 };
+
 
 // Get user profile
 export const getUserProfile = async (req, res) => {

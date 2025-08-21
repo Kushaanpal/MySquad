@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: function () { return !this.googleId; }, // only required if not Google user
       unique: true,
       trim: true,
     },
@@ -16,8 +16,13 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () { return !this.googleId; }, // only required if not Google user
       minlength: 6,
+    },
+    googleId: {  // new field for Google login
+      type: String,
+      unique: true,
+      sparse: true,
     },
     avatar: {
       type: String,
