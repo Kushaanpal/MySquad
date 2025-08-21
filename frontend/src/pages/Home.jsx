@@ -40,13 +40,13 @@ export default function Home() {
           </p>
           <div className="mt-6 flex gap-4">
             <Link
-              to="/matches/create"
+              to="/venues"
               className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition"
             >
               Book a Venue
             </Link>
             <Link
-              to="/list"
+              to="/venues/create"
               className="px-6 py-3 border border-white text-white rounded-full hover:bg-white hover:text-black transition"
             >
               Get Listed
