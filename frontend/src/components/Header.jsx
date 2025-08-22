@@ -45,16 +45,6 @@ export default function Header() {
         {/* Navigation Links */}
         <nav className="flex items-center gap-6">
           <NavLink
-            to="/matches/create"
-            className={({ isActive }) =>
-              `text-white hover:text-green-400 transition ${
-                isActive ? "text-green-400 font-semibold" : ""
-              }`
-            }
-          >
-            Book Venue
-          </NavLink>
-          <NavLink
             to="/matches"
             className={({ isActive }) =>
               `text-white hover:text-green-400 transition ${
@@ -85,12 +75,6 @@ export default function Header() {
                 className="text-white border border-white px-4 py-1 rounded-full hover:bg-white hover:text-black transition"
               >
                 Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-green-500 text-white px-4 py-1 rounded-full hover:bg-green-600 transition"
-              >
-                Sign Up
               </Link>
             </>
           ) : (

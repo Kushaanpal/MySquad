@@ -5,7 +5,7 @@ import Register from "./pages/Register.jsx";
 import CreateMatch from "./pages/CreateMatch.jsx";
 import Matches from "./pages/Matches.jsx";
 import Venues from "./pages/Venues.jsx";
-
+import VenueForm from "./pages/VenueForm.jsx";
 export default function App() {
   return (
     <Routes>
@@ -15,6 +15,7 @@ export default function App() {
       <Route path="/matches/create" element={<CreateMatch/>} />
       <Route path="/matches" element={<Matches/>} />
        <Route path="/venues" element={<Venues/>}/>
+       <Route path="/venues/create" element={<VenueForm />}/>
     </Routes>
   );
 }
