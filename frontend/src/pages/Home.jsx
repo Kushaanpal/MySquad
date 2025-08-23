@@ -97,7 +97,7 @@ export default function Home() {
             Sign up now and take your game to the next level with MySquad.
           </p>
           <Link
-            to="/register"
+            to="/login"
             className="px-8 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition"
           >
             Get Started

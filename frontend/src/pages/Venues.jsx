@@ -5,7 +5,7 @@ import { MapPin, Search, SlidersHorizontal } from "lucide-react";
 
 // ✅ Haversine formula to calculate distance in km
 function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
-  const R = 6371; // radius of Earth in km
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -26,7 +26,6 @@ export default function Venues() {
   const [sort, setSort] = useState("distance");
 
   useEffect(() => {
-    // ✅ Get user location
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserLocation({
@@ -39,7 +38,6 @@ export default function Venues() {
       }
     );
 
-    // ✅ Fetch venues
     const fetchVenues = async () => {
       try {
         const res = await api.get("/venues");
@@ -54,7 +52,7 @@ export default function Venues() {
     fetchVenues();
   }, []);
 
-  // ✅ Preprocess venues with distance
+  // ✅ Preprocess venues
   const processedVenues = venues
     .map((venue) => {
       let distance = null;
@@ -92,44 +90,46 @@ export default function Venues() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64 text-gray-500 text-lg">
-        Loading venues...
+      <div className="flex justify-center items-center h-64 text-gray-400 text-lg animate-pulse">
+        Fetching venues near you...
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div className="px-6 py-8 max-w-7xl mx-auto bg-black min-h-screen text-white">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Nearby Venues</h1>
-          <p className="text-gray-500 text-sm">
-            Find and book your favorite sports venues
+          <h1 className="text-4xl font-extrabold text-green-500 tracking-tight">
+            Nearby Venues
+          </h1>
+          <p className="text-gray-400 mt-1">
+            Explore, compare & book your favorite sports venues instantly
           </p>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+        <div className="flex items-center space-x-3 mt-6 sm:mt-0">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-4 top-2.5 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="Search venues..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 w-60 border rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="pl-12 pr-4 py-2.5 w-64 border border-gray-700 rounded-full shadow-sm bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
             />
           </div>
 
           {/* Sort */}
           <div className="relative">
-            <SlidersHorizontal className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+            <SlidersHorizontal className="absolute left-4 top-2.5 text-gray-400 w-5 h-5" />
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="pl-10 pr-4 py-2 border rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="pl-12 pr-4 py-2.5 border border-gray-700 rounded-full shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition"
             >
               <option value="distance">Sort by Distance</option>
               <option value="name">Sort by Name</option>
@@ -140,19 +140,23 @@ export default function Venues() {
 
       {/* Venue Grid */}
       {processedVenues.length > 0 ? (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {processedVenues.map((venue) => (
             <div
               key={venue._id}
-              className="transform transition hover:-translate-y-2 hover:shadow-lg"
+              className="transform transition hover:-translate-y-2 hover:shadow-2xl duration-300"
             >
-              <VenueCard venue={venue} />
+              <VenueCard venue={venue} theme="dark" />
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-500 mt-20 text-lg">
-          No venues found 🚫
+        <div className="flex flex-col items-center mt-20 text-gray-400">
+          <MapPin className="w-10 h-10 mb-3 text-gray-500" />
+          <p className="text-lg font-medium">No venues found 🚫</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Try adjusting your search or filters
+          </p>
         </div>
       )}
     </div>

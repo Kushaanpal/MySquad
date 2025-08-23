@@ -70,7 +70,7 @@ export default function VenueCreate() {
 
           {/* Address */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
               <MapPin size={16} /> Address
             </label>
             <input
@@ -121,7 +121,7 @@ export default function VenueCreate() {
 
           {/* Price */}
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
               <DollarSign size={16} /> Price Per Hour
             </label>
             <input
@@ -135,7 +135,7 @@ export default function VenueCreate() {
 
           {/* Capacity */}
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
               <Users size={16} /> Capacity
             </label>
             <input
@@ -161,7 +161,7 @@ export default function VenueCreate() {
 
           {/* Timing */}
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className="text-sm font-semibold mb-2 flex items-center gap-2">
               <Clock size={16} /> Open Time
             </label>
             <input
@@ -173,7 +173,7 @@ export default function VenueCreate() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className="text-sm font-semibold mb-2 flex items-center gap-2">
               <Clock size={16} /> Close Time
             </label>
             <input
@@ -187,7 +187,7 @@ export default function VenueCreate() {
 
           {/* Contact */}
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className="text-sm font-semibold mb-2 flex items-center gap-2">
               <Phone size={16} /> Contact Number
             </label>
             <input
@@ -199,7 +199,7 @@ export default function VenueCreate() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
               <Mail size={16} /> Email
             </label>
             <input
@@ -213,7 +213,7 @@ export default function VenueCreate() {
 
           {/* Images */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+            <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
               <ImagePlus size={16} /> Upload Images
             </label>
             <input
